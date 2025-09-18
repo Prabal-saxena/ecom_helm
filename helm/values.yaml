@@ -1,0 +1,75 @@
+enabled: true
+deploymentName: "ecom_helm"
+namespace: "app"
+containerName: "ecom_helm"
+distributed_tracing_enabled: "true"
+log_level: "info"
+log: "stdout"
+app_name: "ecom_helm"
+version: 0.0.1
+env: "dev"
+
+# Service Values
+serviceName: "ecom_helm"
+
+# ServiceAccount
+ksaServiceAccount: ecom-helm-sa
+gcpServiceAccount: ecom-helm-sa@noble-linker-471623-s6.iam.gserviceaccount.com
+
+datasource:
+  driver: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/liquorservices?currentSchema=users
+  username: # ************Need to be created***************
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# App image details (replaced by helm)
+image:
+  repository: us-central1-docker.pkg.dev/noble-linker-471623-s6/onlineliquorservicesartifactory
+  pullPolicy: IfNotPresent
+  tag: "0.0.1-ecom_helm"
+
+imagePullSecrets:
+  - name: regcred
+podAnnotations: {}
+
+podSecurityContext: {}
+
+#Deployment strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+# Replica count for the deployment
+replicaCount: 1
+
+#The Key of node labels
+topologyKey: "topology.kubernetes.io/zone"
+
+service:
+  type: LoadBalancer
+  portName: http
+  port: 80
+  TargetPort: 8080
+  annotations:
+    networking.gke.io/internal-load-balancer-allow-global-access: "true"
+    networking.gkr.io/load-balancer-type: "Internal"
+
+# Resource Limits
+resources:
+  limits:
+    cpu: "1"
+    memory: 1Gi
+  requests:
+    cpu: "500m"
+    memory: 800Mi
+nodeSelector: { }
+tolerations: [ ]
+affinity: { }

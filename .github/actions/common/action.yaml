@@ -1,0 +1,22 @@
+name: Common Steps
+description: Configure Common Steps
+
+runs:
+  using: "composite"
+  steps:
+    - name: Authenticate to GCP
+      id: auth
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.CI_CD_SA_SECRET }}
+
+    - name: Configure environment
+      shell: bash
+      run: |-
+        echo "running on branch $GITHUB_REF"
+        echo "TARGET_ENV=dev" >> $GITHUB_ENV
+
+    - name: Configure to use GCP Artifact Registry
+      shell: bash
+      run: |-
+        gcloud auth configure-docker us-central1-docker.pkg.dev
