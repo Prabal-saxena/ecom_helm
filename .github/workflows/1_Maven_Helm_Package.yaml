@@ -22,6 +22,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.CI_CD_SA_SECRET }}
+
       - name: Common Setup for Artifactory Credentials & file version
         uses: ./.github/actions/common
 
