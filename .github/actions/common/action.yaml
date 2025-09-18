@@ -8,7 +8,7 @@ runs:
       id: auth
       uses: google-github-actions/auth@v2
       with:
-        credentials_json: ${{ secrets.CI_CD_SA_SECRET }}
+        credentials_json: ${{ secrets.TERRAFORM_GITHUB_SA_SECRET }}
 
     - name: Configure environment
       shell: bash
