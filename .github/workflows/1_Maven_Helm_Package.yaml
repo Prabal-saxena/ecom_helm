@@ -37,6 +37,9 @@ jobs:
           zip -r ${APPLICATION_NAME}.zip helm/
           ls -lh ${APPLICATION_NAME}.zip
 
+      - name: Debug whoami
+        run: gcloud auth list
+
       - name: Upload .zip to GCS
         run: |-
           gsutil cp ${APPLICATION_NAME}.zip gs://${BUCKET_NAME}/${APPLICATION_NAME}/${TARGET_ENV}/${APPLICATION_NAME}.zip
