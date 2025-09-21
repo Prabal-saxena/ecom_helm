@@ -30,15 +30,16 @@ jobs:
       - name: Common Setup for Artifactory Credentials & file version
         uses: ./.github/actions/common
 
-      - name: Package Helm templates into ZIP
+      - name: Package Helm Chart
         run: |- 
           echo "Zipping helm templates..."
-          zip -r ${APPLICATION_NAME}.zip helm/
-          ls -lh ${APPLICATION_NAME}.zip
+          helm package ./helm
+
+      - name: Install Helm OCI Push Plugin
+        run: helm plugin install https://github.com/chartmuseum/helm-push
 
       - name: Uploads to GCP Artifactory
         shell: bash
         run: |-
           echo "Push to artifactory"
-          curl -T ${APPLICATION_NAME}.zip \
-               "${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/${APPLICATION_NAME}/${APPLICATION_NAME}.zip"
+          helm push ecom_helm-0.1.0.tgz oci://${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}
