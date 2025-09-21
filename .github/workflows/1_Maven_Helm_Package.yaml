@@ -10,9 +10,10 @@ permissions:
   contents: write
 
 env:
-  ARTIFACTORY_URL: "us-central1-docker.pkg.dev/noble-linker-471623-s6"
+  BUCKET_NAME: "onlineliquorservices_bucket"
   ARTIFACTORY_REPO: "common-artifacts"
   APPLICATION_NAME: "ecom_helm"
+  TARGET_ENV: "dev"
 
 jobs:
   build:
@@ -30,16 +31,12 @@ jobs:
       - name: Common Setup for Artifactory Credentials & file version
         uses: ./.github/actions/common
 
-      - name: Package Helm Chart
+      - name: Zip Helm templates
         run: |- 
           echo "Zipping helm templates..."
-          helm package ./helm
+          zip -r ${APPLICATION_NAME}.zip helm/
+          ls -lh ${APPLICATION_NAME}.zip
 
-      - name: Install Helm OCI Push Plugin
-        run: helm plugin install https://github.com/chartmuseum/helm-push
-
-      - name: Uploads to GCP Artifactory
-        shell: bash
+      - name: Upload .zip to GCS
         run: |-
-          echo "Push to artifactory"
-          helm push ecom_helm-0.1.0.tgz oci://${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}
+          gsutil cp ${APPLICATION_NAME}.zip gs://${BUCKET_NAME}/${APPLICATION_NAME}/${TARGET_ENV}/${APPLICATION_NAME}.zip
