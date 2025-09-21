@@ -37,6 +37,9 @@ jobs:
           zip -r ${APPLICATION_NAME}.zip helm/
           ls -lh ${APPLICATION_NAME}.zip
 
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
       - name: Debug whoami
         run: gcloud auth list
 
