@@ -1,3 +1,6 @@
+# --------------------------------------------------
+# Role for microservice pods
+# --------------------------------------------------
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -8,6 +11,9 @@ rules:
     resource: ["*"]
     verbs: ["get", "watch", "list", "create", "update", "delete", "patch"]
 ---
+# --------------------------------------------------
+# ServiceAccount for microservice pods
+# --------------------------------------------------
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -16,6 +22,9 @@ metadata:
   annotations:
     iam.gke.io/gcp-service-account: {{ .Values.gcpServiceAccount }}
 ---
+# --------------------------------------------------
+# RoleBinding for microservice pods
+# --------------------------------------------------
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -23,8 +32,39 @@ metadata:
   namespace: {{.Values.namespace}}
 subjects:
   - kind: ServiceAccount
-    name: {{.Values.deploymentName}}-sa
+    name: {{.Values.ksaServiceAccount}}
+    namespace: {{ .Values.namespace }}
 roleRef:
   kind: Role
   name: {{.Values.deploymentName}}-sa-pod-creator
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# --------------------------------------------------
+# ServiceAccount for CI/CD pipeline (GitHub Actions, Jenkins, etc.)
+# --------------------------------------------------
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{.Values.cicdKsaServiceAccount}}
+  namespace: {{.Values.namespace}}
+  annotations:
+    iam.gke.io/gcp-service-account: {{ .Values.cicdGcpServiceAccount }}
+
+---
+# --------------------------------------------------
+# RoleBinding for CI/CD pipeline
+# --------------------------------------------------
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{.Values.cicdKsaServiceAccount}}-deployer
+  namespace: {{.Values.namespace}}
+subjects:
+  - kind: ServiceAccount
+    name: {{.Values.cicdKsaServiceAccount}}
+    namespace: {{ .Values.namespace }}
+roleRef:
+  kind: ClusterRole
+  name: edit
   apiGroup: rbac.authorization.k8s.io
