@@ -8,7 +8,7 @@ metadata:
   name: {{.Values.deploymentName}}-sa-pod-creator
 rules:
   - apiGroups: [""]
-    resource: ["*"]
+    resources: ["*"]
     verbs: ["get", "watch", "list", "create", "update", "delete", "patch"]
 ---
 # --------------------------------------------------
