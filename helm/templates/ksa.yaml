@@ -11,7 +11,7 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{.Values.deploymentName}}-sa
+  name: {{.Values.ksaServiceAccount}}
   namespace: {{.Values.namespace}}
   annotations:
     iam.gke.io/gcp-service-account: {{ .Values.gcpServiceAccount }}
