@@ -2,17 +2,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.deploymentName }}
+  namespace: {{ .Values.namespace }}
   labels:
-    app.kubernetes.io/name: { { .Chart.name } }
-    app.kubernetes.io/instance: {{ .Values.release }}
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: { { .Chart.name } }
-      app.kubernetes.io/instance: {{ .Values.release }}
+      app.kubernetes.io/name: {{ .Chart.Name }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -20,8 +21,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        app.kubernetes.io/name: { { .Chart.name } }
-        app.kubernetes.io/instance: { { .Values.release } }
+        app.kubernetes.io/name: {{ .Chart.Name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
         app: {{.Values.deploymentName }}
         version: {{ .Chart.AppVersion}}
 #      name: {{.Values.deploymentName }}

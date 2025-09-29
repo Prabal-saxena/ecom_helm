@@ -5,4 +5,4 @@ metadata:
   namespace: {{ .Values.namespace }}
 data:
   application.yaml: |-
-    {{ .File.Get "resources/application.yaml" | indent 4 }}
+    {{ .Files.Get "resources/application.yaml" | nindent 4 }}
