@@ -20,6 +20,11 @@ metadata:
   name: {{.Values.ksaServiceAccount}}
   namespace: {{.Values.namespace}}
   annotations:
+    # 1. This hook ensures the ServiceAccount is created BEFORE the main install/upgrade.
+    helm.sh/hook: pre-install,pre-upgrade
+    # 2. This policy ensures the resource is NOT deleted when the hook completes.
+    helm.sh/hook-delete-policy: before-hook-creation
+
     iam.gke.io/gcp-service-account: {{ .Values.gcpServiceAccount }}
 ---
 # --------------------------------------------------
@@ -41,7 +46,7 @@ roleRef:
 
 ---
 # --------------------------------------------------
-# ServiceAccount for CI/CD pipeline (GitHub Actions, Jenkins, etc.)
+# ServiceAccount for CI/CD pipeline (GitHub Actions)
 # --------------------------------------------------
 apiVersion: v1
 kind: ServiceAccount
@@ -49,6 +54,10 @@ metadata:
   name: {{.Values.cicdKsaServiceAccount}}
   namespace: {{.Values.namespace}}
   annotations:
+    # Apply the same hook logic to ensure the CI/CD Service Account is ready early.
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+
     iam.gke.io/gcp-service-account: {{ .Values.cicdGcpServiceAccount }}
 
 ---
