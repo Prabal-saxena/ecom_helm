@@ -66,8 +66,8 @@ spec:
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: postgres.password
-                  name: '{{.Values.deploymentName}}-secret'
+                  key: pgsql.password
+                  name: '{{.Values.deploymentName}}-api-secret'
           volumeMounts:
             - name: {{.Values.deploymentName }}-config
               mountPath: /deployments/application-config
