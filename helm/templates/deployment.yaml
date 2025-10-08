@@ -31,7 +31,23 @@ spec:
         - name: regcred
       serviceAccountName: {{.Values.ksaServiceAccount }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        { { - toYaml .Values.podSecurityContext | nindent 8 } }
+      initContainers:
+        - name: wait-for-secret-store
+          image: bitnami/kubectl:latest
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c']
+          args:
+            - |
+              TARGET_SECRET_NAME='{{.Values.deploymentName}}-api-secret'
+              NAMESPACE='{{.Values.namespace}}'
+              echo "Waiting for K8s Secret $TARGET_SECRET_NAME to be created by ExternalSecrets Operator..."
+              
+              while ! kubectl get secret $TARGET_SECRET_NAME -n $NAMESPACE > /dev/null 2>&1; do
+                echo "Secret $TARGET_SECRET_NAME not found. Waiting 5 seconds..."
+                sleep 5
+              done
+              echo "Secret $TARGET_SECRET_NAME found. Proceeding with main container."
       containers:
         - name: {{ .Values.containerName }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
