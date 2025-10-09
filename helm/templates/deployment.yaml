@@ -38,12 +38,8 @@ spec:
             - |
               TARGET_SECRET_NAME='{{.Values.deploymentName}}-api-secret'
               NAMESPACE='{{.Values.namespace}}'
-              echo "Waiting for K8s Secret $TARGET_SECRET_NAME to be created by ExternalSecrets Operator..."
-              
-              while ! kubectl get secret $TARGET_SECRET_NAME -n $NAMESPACE > /dev/null 2>&1; do
-                echo "Secret $TARGET_SECRET_NAME not found. Waiting 5 seconds..."
-                sleep 5
-              done
+              echo "Waiting 20 seconds for K8s Secret $TARGET_SECRET_NAME to be created by ExternalSecrets Operator..."
+              sleep 20
               echo "Secret $TARGET_SECRET_NAME found. Proceeding with main container."
       serviceAccountName: {{.Values.ksaServiceAccount }}
       securityContext:
