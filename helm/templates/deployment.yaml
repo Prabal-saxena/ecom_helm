@@ -29,6 +29,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      initContainers:
+        - name: wait-for-secret-store
+          image: bitnami/kubectl:latest
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c']
+          args:
+            - |
+              TARGET_SECRET_NAME='{{.Values.deploymentName}}-api-secret'
+              NAMESPACE='{{.Values.namespace}}'
+              echo "Waiting 20 seconds for K8s Secret $TARGET_SECRET_NAME to be created by ExternalSecrets Operator..."
+              sleep 20
+              echo "Secret $TARGET_SECRET_NAME found. Proceeding with main container."
       serviceAccountName: {{.Values.ksaServiceAccount }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -66,8 +78,8 @@ spec:
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: postgres.password
-                  name: '{{.Values.deploymentName}}-secret'
+                  key: pgsql.password
+                  name: '{{.Values.deploymentName}}-api-secret'
           volumeMounts:
             - name: {{.Values.deploymentName }}-config
               mountPath: /deployments/application-config
