@@ -93,10 +93,10 @@ spec:
         # -- Cloud SQL Auth Proxy Sidecar Container ---
         - name: cloud-sql-proxy
           image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:latest
-          command:
-            - "/cloud_sql_proxy"
-            - "-ip_address_types=PUBLIC"
-            - "-instances=noble-linker-471623-s6:us-central1:pg-instance=tcp:5433" # CloudSQL instance Connection name
+          args:
+            - "--public-ip"
+            - "--structured-logs"
+            - "noble-linker-471623-s6:us-central1:pg-instance" # CloudSQL instance Connection name
           securityContext:
             runAsNonRoot: true
           resources:
