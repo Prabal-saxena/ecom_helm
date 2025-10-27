@@ -75,6 +75,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+            - name: DB_HOST
+              value: "127.0.0.1"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              value: "postgres"
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -84,6 +90,19 @@ spec:
             - name: {{.Values.deploymentName }}-config
               mountPath: /deployments/application-config
               readOnly: true
+        # -- Cloud SQL Auth Proxy Sidecar Container ---
+        - name: cloud-sql-proxy
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:latest
+          args:
+            - "--private-ip"
+            - "--structured-logs"
+            - "noble-linker-471623-s6:us-central1:pg-instance" # CloudSQL instance Connection name
+          securityContext:
+            runAsNonRoot: true
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
