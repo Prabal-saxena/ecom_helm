@@ -55,7 +55,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: 8080
+              port: {{ .Values.service.TargetPort }}
               scheme: HTTP
             failureThreshold: 5
             initialDelaySeconds: 60
@@ -65,7 +65,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8080
+              port: {{ .Values.service.TargetPort }}
               scheme: HTTP
             failureThreshold: 5
             initialDelaySeconds: 5
@@ -78,7 +78,7 @@ spec:
             - name: DB_HOST
               value: "127.0.0.1"
             - name: DB_PORT
-              value: "5432"
+              value: "5433"
             - name: DB_USER
               value: "postgres"
             - name: DATABASE_PASSWORD
@@ -92,11 +92,12 @@ spec:
               readOnly: true
         # -- Cloud SQL Auth Proxy Sidecar Container ---
         - name: cloud-sql-proxy
-          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:latest
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
           args:
-            - "--private-ip"
+            - "--auto-iam-authn"
             - "--structured-logs"
-            - "noble-linker-471623-s6:us-central1:pg-instance" # CloudSQL instance Connection name
+            - "--port=5433"
+            - "noble-linker-471623-s6:us-central1:pg-instance"
           securityContext:
             runAsNonRoot: true
           resources:
