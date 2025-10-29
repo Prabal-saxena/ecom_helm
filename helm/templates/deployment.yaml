@@ -55,7 +55,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: 8080
+              port: {{ .Values.service.TargetPort }}
               scheme: HTTP
             failureThreshold: 5
             initialDelaySeconds: 60
@@ -65,7 +65,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8080
+              port: {{ .Values.service.TargetPort }}
               scheme: HTTP
             failureThreshold: 5
             initialDelaySeconds: 5
